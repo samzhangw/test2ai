@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 取得 HTML 元素
+    // 取得 HTML 元素 (與前一版相同)
     const canvas = document.getElementById('game-canvas');
     const ctx = canvas.getContext('2d');
     const player1ScoreBox = document.getElementById('player1-score');
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetButton = document.getElementById('reset-button');
     const gameModeSelect = document.getElementById('game-mode');
 
-    // 遊戲設定
+    // 遊戲設定 (與前一版相同)
     const GRID_SIZE = 4;
     const DOT_SPACING = 100;
     const PADDING = 50;
@@ -20,14 +20,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const LINE_WIDTH = 8;
     const CLICK_TOLERANCE_DOT = 15;
 
-    // 玩家顏色
+    // 玩家顏色 (與前一版相同)
     const PLAYER_COLORS = {
         1: { line: '#3498db', fill: 'rgba(52, 152, 219, 0.3)' },
         2: { line: '#e74c3c', fill: 'rgba(231, 76, 60, 0.3)' },
     };
     const DEFAULT_LINE_COLOR = '#bbbbbb';
 
-    // 遊戲狀態
+    // 遊戲狀態 (與前一版相同)
     let currentPlayer = 1;
     let scores = { 1: 0, 2: 0 };
     let dots = [];
@@ -39,14 +39,24 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedDot2 = null;
     let gameMode = 'pvp';
 
-    // 初始化遊戲 (與前一版相同)
+    // 初始化遊戲
     function initGame() {
         const canvasSize = (GRID_SIZE - 1) * DOT_SPACING + PADDING * 2;
         canvas.width = canvasSize;
         canvas.height = canvasSize;
         
         gameMode = gameModeSelect.value;
-        currentPlayer = 1;
+        
+        // --- 【修改】 ---
+        if (gameMode === 'pvc') {
+            // 隨機決定開始玩家 (0.5 機率為 1 或 2)
+            currentPlayer = Math.random() < 0.5 ? 1 : 2;
+        } else {
+            // pvp 模式固定 P1 開始
+            currentPlayer = 1;
+        }
+        // --- 【修改結束】 ---
+        
         scores = { 1: 0, 2: 0 };
         dots = [];
         lines = {};
@@ -57,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameOverMessage.classList.add('hidden');
         canvas.style.pointerEvents = 'auto';
 
-        // 1. 產生點
+        // 1. 產生點 (與前一版相同)
         for (let r = 0; r < GRID_SIZE; r++) {
             dots[r] = [];
             for (let c = 0; c < GRID_SIZE; c++) {
@@ -69,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // 2. 產生線段
+        // 2. 產生線段 (與前一版相同)
         lines = {};
         for (let r = 0; r < GRID_SIZE; r++) {
             for (let c = 0; c < GRID_SIZE; c++) {
@@ -84,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // 3. 產生正方形
+        // 3. 產生正方形 (與前一版相同)
         squares = [];
         for (let r = 0; r < GRID_SIZE - 1; r++) {
             for (let c = 0; c < GRID_SIZE - 1; c++) {
@@ -106,6 +116,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         updateUI();
         drawCanvas();
+
+        // --- 【新增】 ---
+        // 如果隨機結果是 AI (玩家 2) 先開始，則觸發 AI 行動
+        if (gameMode === 'pvc' && currentPlayer === 2) {
+            checkAndTriggerAIMove();
+        }
+        // --- 【新增結束】 ---
     }
 
     // 繪製所有遊戲元素 (與前一版相同)
@@ -123,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 const playerLabel = (gameMode === 'pvc' && sq.player === 2) ? "C" : sq.player;
-                ctx.fillText(playerLabel, sq.x + sq.size / 2, sq.y + sq.size / 2 + 5); 
+                ctx.fillText(playerLabel, sq.x + sq.size / 2, sq.y + sq.size / 2 + 5);
             }
         });
 
@@ -166,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 4. 重疊 (P1 和 P2 都有)
                 let dx = line.p2.x - line.p1.x;
                 let dy = line.p2.y - line.p1.y;
-                const len = Math.max(1, Math.sqrt(dx * dx + dy * dy)); 
+                const len = Math.max(1, Math.sqrt(dx * dx + dy * dy));
                 const norm_x = -dy / len;
                 const norm_y = dx / len;
 
@@ -190,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.lineWidth = halfWidth;
                 ctx.stroke();
             }
-            ctx.setLineDash([]); 
+            ctx.setLineDash([]);
         }
 
         // 3. 繪製所有的點
@@ -254,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
         drawCanvas();
     }
 
-    // "確認連線" 按鈕的函式
+    // "確認連線" 按鈕的函式 (與前一版相同)
     function confirmLine() {
         if (!selectedDot1 || !selectedDot2) return;
         const dotA = selectedDot1;
@@ -292,7 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        let scoredThisTurn = false; // 仍然需要檢查是否得分，但只用於計分
+        let scoredThisTurn = false;
         let totalFilledSquares = 0;
         
         squares.forEach(sq => {
@@ -303,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     sq.filled = true;
                     sq.player = currentPlayer;
                     scores[currentPlayer]++;
-                    scoredThisTurn = true; // 標記得分
+                    scoredThisTurn = true;
                 }
             }
             if (sq.filled) totalFilledSquares++;
@@ -321,12 +338,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // --- 【修改】 ---
-        // 移除 if (!scoredThisTurn) 判斷
-        // 無論是否得分，都切換玩家
+        // 無論是否得分，都切換玩家 (與前一版相同)
         switchPlayer();
         
-        // 檢查是否輪到 AI
         checkAndTriggerAIMove();
     }
 
@@ -372,7 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let c = dotA.c;
         
         if (dr !== 0 && dc !== 0) {
-            return []; 
+            return [];
         }
 
         while (r !== dotB.r || c !== dotB.c) {
@@ -434,12 +448,11 @@ document.addEventListener('DOMContentLoaded', () => {
         canvas.style.pointerEvents = 'auto';
     }
     
-    // --- AI 相關函式 ---
+    // --- AI 相關函式 (與前一版相同) ---
 
-    // checkAndTriggerAIMove (與前一版相同)
     function checkAndTriggerAIMove() {
         if (gameMode === 'pvc' && currentPlayer === 2 && !isGameOver()) {
-            canvas.style.pointerEvents = 'none'; 
+            canvas.style.pointerEvents = 'none';
             actionBar.classList.add('hidden');
             
             setTimeout(() => {
@@ -455,7 +468,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // AI 執行一步
     function aiMove() {
         let availableSegments = [];
         for (const id in lines) {
@@ -473,7 +485,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let safeMoves = [];
         let unsafeMoves = [];
 
-        // (AI 的決策邏輯不變)
         for (const segment of availableSegments) {
             let squaresCompleted = 0;
             let isUnsafe = false;
@@ -526,7 +537,7 @@ document.addEventListener('DOMContentLoaded', () => {
             segmentToDraw.players.push(currentPlayer);
         }
         
-        let scoredThisTurn = false; // 仍然需要計分
+        let scoredThisTurn = false;
         let totalFilledSquares = 0;
         
         squares.forEach(sq => {
@@ -537,7 +548,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     sq.filled = true;
                     sq.player = currentPlayer;
                     scores[currentPlayer]++;
-                    scoredThisTurn = true; 
+                    scoredThisTurn = true;
                 }
             }
             if (sq.filled) totalFilledSquares++;
@@ -551,11 +562,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // --- 【修改】 ---
-        // 移除 if (!scoredThisTurn) 的 else 區塊
-        // 無論 AI 是否得分，都切換回玩家
+        // 無論 AI 是否得分，都切換回玩家 (與前一版相同)
         switchPlayer();
-        canvas.style.pointerEvents = 'auto'; // 輪到玩家，解鎖畫布
+        canvas.style.pointerEvents = 'auto';
     }
 
     // --- 結束 AI 相關函式 ---
