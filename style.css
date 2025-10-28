@@ -1,22 +1,28 @@
-/* --- 變數定義 (與前一版相同) --- */
+/* --- CSS 變數：方便管理顏色和常用值 --- */
 :root {
     --font-main: 'Nunito', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    --color-bg: #fdfaf6;
-    --color-text: #34495e;
-    --color-border: #e0e0e0;
+    --color-bg: #fdfaf6; /* 淺米色背景 */
+    --color-text: #34495e; /* 深藍灰色文本 */
+    --color-border: #e0e0e0; /* 淺灰色邊框 */
     --color-white: #ffffff;
-    --p1-color: #3498db;
-    --p1-bg: #ecf5fb;
-    --p2-color: #e74c3c;
-    --p2-bg: #fdf5f4;
+    
+    /* 玩家顏色 */
+    --p1-color: #3498db; /* 藍色 */
+    --p1-bg: #ecf5fb; /* 淺藍背景 */
+    --p2-color: #e74c3c; /* 紅色 */
+    --p2-bg: #fdf5f4; /* 淺紅背景 */
+
+    /* 按鈕顏色 */
     --btn-primary: #3498db;
     --btn-success: #2ecc71;
     --btn-danger: #e74c3c;
+
+    /* 陰影效果 */
     --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* --- 【新】 基礎樣式 (包含手機優化) --- */
+/* --- 基礎樣式重置與整體佈局 --- */
 * {
     box-sizing: border-box; /* 確保 padding 不會撐爆寬度 */
 }
@@ -26,149 +32,228 @@ body {
     background-color: var(--color-bg);
     color: var(--color-text);
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
+    flex-direction: column; /* 垂直排列子元素 */
+    align-items: center; /* 水平置中 */
+    min-height: 100vh; /* 確保至少佔滿整個視窗高度 */
     margin: 0;
-    padding: 10px; /* 在螢幕邊緣增加一點留白 */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    padding: 20px; /* 增加頁面邊緣留白 */
+    -webkit-font-smoothing: antialiased; /* 字體抗鋸齒 */
+    -moz-osx-font-smoothing: grayscale; /* 字體抗鋸齒 */
 }
 
 h1 {
-    font-size: 2.5rem;
+    font-size: 2.8rem; /* 標題字體大小 */
     font-weight: 700;
-    color: #2c3e50;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
-    text-align: center; /* 手機上標題置中較佳 */
+    color: #2c3e50; /* 比一般文字更深的顏色 */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.05); /* 輕微文字陰影 */
+    margin-bottom: 30px; /* 增加與遊戲容器的間距 */
+    text-align: center;
 }
 
-/* --- 【修改】 遊戲容器 (流體寬度) --- */
+/* --- 遊戲容器 --- */
 #game-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
-    width: 100%; /* 佔滿可用寬度 */
-    max-width: 500px; /* 最大寬度 (桌機版) */
+    gap: 25px; /* 增加各區塊間距 */
+    width: 100%;
+    max-width: 550px; /* 限制最大寬度，避免在寬螢幕上過大 */
+    padding: 25px;
+    background-color: var(--color-white);
+    border-radius: 15px; /* 圓角容器 */
+    box-shadow: var(--shadow-md); /* 顯著陰影 */
+    border: 1px solid var(--color-border);
 }
 
-/* --- 【修改】 計分板 (流體寬度) --- */
+/* --- 計分板 --- */
 #status-bar {
     display: flex;
     justify-content: space-between;
-    width: 100%; /* 佔滿容器寬度 */
-    gap: 10px; /* 縮小一點間距 */
+    width: 100%;
+    gap: 15px; /* 增加分數框間距 */
 }
 
 .score-box {
-    flex: 1;
-    font-size: 1.15em; /* 稍微縮小以適應手機 */
+    flex: 1; /* 平均分配寬度 */
+    font-size: 1.25em; /* 調整字體大小 */
     font-weight: 600;
-    padding: 12px 10px; /* 調整 padding */
-    border-radius: 10px;
+    padding: 15px 10px; /* 調整 padding */
+    border-radius: 12px; /* 圓角分數框 */
     background-color: var(--color-white);
-    color: #95a5a6;
+    color: #95a5a6; /* 非活躍玩家的分數顏色 */
     border: 2px solid var(--color-border);
     box-shadow: var(--shadow-sm);
     text-align: center;
-    transition: all 0.3s ease;
+    transition: all 0.3s ease; /* 平滑過渡效果 */
 }
 
-/* 玩家 1 啟用狀態 (相同) */
+/* 玩家 1 啟用狀態 */
 .score-box.active {
     border-color: var(--p1-color);
     color: var(--p1-color);
     background-color: var(--p1-bg);
-    transform: scale(1.05);
-    box-shadow: 0 3px 8px rgba(52, 152, 219, 0.3);
+    transform: scale(1.03); /* 輕微放大 */
+    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.2); /* 藍色陰影 */
 }
 
-/* 玩家 2 啟用狀態 (相同) */
+/* 玩家 2 (或電腦) 啟用狀態 */
 .score-box.player2.active {
     border-color: var(--p2-color);
     color: var(--p2-color);
     background-color: var(--p2-bg);
-    box-shadow: 0 3px 8px rgba(231, 76, 60, 0.3);
+    box-shadow: 0 4px 10px rgba(231, 76, 60, 0.2); /* 紅色陰影 */
 }
 
-/* --- 【修改】 遊戲畫布 (響應式) --- */
+/* --- 遊戲畫布 --- */
 canvas {
     background-color: var(--color-white);
-    border-radius: 12px;
+    border-radius: 15px;
     box-shadow: var(--shadow-md);
     border: 1px solid var(--color-border);
     cursor: pointer;
-    width: 100%; /* 關鍵：讓畫布寬度縮放 */
-    height: auto; /* 關鍵：讓畫布高度等比縮放 */
+    width: 100%; /* 響應式寬度 */
+    height: auto; /* 高度自動 */
 }
 
-/* --- 【修改】 統一按鈕樣式 (觸控優化) --- */
+/* --- 按鈕樣式 --- */
 .btn {
     font-family: var(--font-main);
-    font-size: 1rem; /* 確保文字夠大 */
+    font-size: 1.05rem; /* 稍微增大字體 */
     font-weight: 700;
-    padding: 14px 24px; /* 增加垂直 padding 讓按鈕更高 */
+    padding: 15px 28px; /* 調整 padding */
     border: none;
-    border-radius: 8px;
+    border-radius: 10px; /* 圓角按鈕 */
     cursor: pointer;
     box-shadow: var(--shadow-sm);
     transition: all 0.2s ease-in-out;
     color: white;
-    width: 100%; /* 讓按鈕在小畫面上佔滿寬度 */
+    width: 100%; /* 手機上佔滿寬度 */
 }
 
-/* (按鈕懸停效果... 在手機上不明顯，但保留) */
 .btn:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px) scale(1.01); /* 輕微上浮和放大 */
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
 }
 .btn:active {
-    transform: translateY(0) scale(0.98);
+    transform: translateY(0) scale(0.99);
     box-shadow: var(--shadow-sm);
 }
+
 .btn.primary { background-color: var(--btn-primary); }
 .btn.success { background-color: var(--btn-success); }
 .btn.danger  { background-color: var(--btn-danger); }
 
-/* --- 【修改】 按鈕控制區 --- */
+/* --- 按鈕控制區 --- */
 #action-bar {
     display: flex;
-    gap: 10px;
-    width: 100%; /* 佔滿寬度 */
-    flex-direction: column; /* 【新】 手機上改為垂直排列 */
-}
-
-#game-controls {
-    text-align: center;
+    gap: 15px;
     width: 100%;
+    flex-direction: column; /* 手機上垂直排列 */
 }
 
-/* --- 遊戲結束訊息 (相同) --- */
+/* --- 遊戲結束訊息 --- */
 #game-over-message {
     text-align: center;
+    padding: 15px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    width: 100%;
+    box-shadow: var(--shadow-sm);
 }
 #winner-text {
     display: block;
-    font-size: 1.8em;
+    font-size: 2em; /* 獲勝者文字更大 */
     font-weight: 700;
-    color: var(--color-text);
+    color: #2c3e50;
+    margin-bottom: 5px;
 }
+
 .hidden {
     display: none !important;
 }
 
-/* --- 【新】 媒體查詢 (針對平板和桌機) --- */
-/* 當螢幕寬度大於 500px 時... */
-@media (min-width: 500px) {
-    /* ...將按鈕改回水平排列 */
+/* --- 遊戲控制區 (重新開始, 模式選擇) --- */
+#game-controls {
+    display: flex;
+    flex-direction: column; /* 手機上垂直排列 */
+    gap: 15px;
+    width: 100%;
+}
+
+#game-mode-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px; /* 標籤與選單間距 */
+    font-size: 1.05rem;
+    font-weight: 600;
+    padding: 10px 0; /* 輕微垂直 padding */
+}
+
+#game-mode {
+    font-family: var(--font-main);
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 10px 15px; /* 調整選單 padding */
+    border-radius: 8px;
+    border: 2px solid var(--color-border);
+    background-color: var(--color-white);
+    color: var(--color-text);
+    appearance: none; /* 移除預設下拉箭頭 */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23bbbbbb%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.8-6.1H19.2c-7.5%200-13.8%204-16.3%2010.5-2.5%206.5-.5%2013.7%205.1%2018.1l128.5%20120.4c5.7%205.3%2013.7%208.2%2022%208.2s16.3-2.9%2022-8.2l128.5-120.4c5.6-4.4%207.6-11.6%205.1-18.1z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+    padding-right: 35px; /* 為箭頭騰出空間 */
+    cursor: pointer;
+}
+
+/* --- 媒體查詢 (針對平板和桌機) --- */
+@media (min-width: 550px) {
+    h1 {
+        font-size: 3.2rem;
+    }
+
+    #game-container {
+        padding: 35px;
+        gap: 30px;
+    }
+
+    #status-bar {
+        gap: 20px;
+    }
+
+    .score-box {
+        font-size: 1.4em;
+    }
+
+    /* 將按鈕改回水平排列 */
     #action-bar {
         flex-direction: row;
     }
     
     .btn {
         width: auto; /* 按鈕恢復自動寬度 */
+        min-width: 150px; /* 確保按鈕有最小寬度 */
     }
     
-    /* (計分板和標題的字體可以稍微調回來，但目前這樣也ok) */
+    /* 讓控制項水平排列 */
+    #game-controls {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    #reset-button {
+        width: auto;
+        min-width: 150px;
+    }
+    #game-mode-selector {
+        justify-content: flex-start; /* 左對齊 */
+    }
+}
+
+/* 確保畫布上的文字顏色和背景有足夠對比 */
+canvas {
+    color: var(--color-text); /* 確保畫布上的文字繼承主文本顏色 */
 }

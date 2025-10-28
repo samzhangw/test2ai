@@ -1,9 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 取得 HTML 元素 (相同)
+    // 取得 HTML 元素
     const canvas = document.getElementById('game-canvas');
     const ctx = canvas.getContext('2d');
-    const score1El = document.getElementById('score1');
-    const score2El = document.getElementById('score2');
     const player1ScoreBox = document.getElementById('player1-score');
     const player2ScoreBox = document.getElementById('player2-score');
     const gameOverMessage = document.getElementById('game-over-message');
@@ -12,25 +10,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelLineButton = document.getElementById('cancel-line-button');
     const actionBar = document.getElementById('action-bar');
     const resetButton = document.getElementById('reset-button');
+    const gameModeSelect = document.getElementById('game-mode');
 
     // 遊戲設定
     const GRID_SIZE = 4;
     const DOT_SPACING = 100;
     const PADDING = 50;
     const DOT_RADIUS = 6;
-    // --- 【修改 1】 ---
-    const LINE_WIDTH = 8; // (原: 4) 總寬度
+    const LINE_WIDTH = 8;
     const CLICK_TOLERANCE_DOT = 15;
 
-    // 玩家顏色 (相同)
+    // 玩家顏色
     const PLAYER_COLORS = {
         1: { line: '#3498db', fill: 'rgba(52, 152, 219, 0.3)' },
         2: { line: '#e74c3c', fill: 'rgba(231, 76, 60, 0.3)' },
     };
-    // --- 【修改 2】 ---
-    const DEFAULT_LINE_COLOR = '#bbbbbb'; // (原: #e0e0e0)
+    const DEFAULT_LINE_COLOR = '#bbbbbb';
 
-    // 遊戲狀態 (相同)
+    // 遊戲狀態
     let currentPlayer = 1;
     let scores = { 1: 0, 2: 0 };
     let dots = [];
@@ -40,12 +37,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let selectedDot1 = null;
     let selectedDot2 = null;
+    let gameMode = 'pvp';
 
-    // 初始化遊戲 (相同)
+    // 初始化遊戲 (與前一版相同)
     function initGame() {
         const canvasSize = (GRID_SIZE - 1) * DOT_SPACING + PADDING * 2;
         canvas.width = canvasSize;
         canvas.height = canvasSize;
+        
+        gameMode = gameModeSelect.value;
         currentPlayer = 1;
         scores = { 1: 0, 2: 0 };
         dots = [];
@@ -55,8 +55,9 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedDot2 = null;
         actionBar.classList.add('hidden');
         gameOverMessage.classList.add('hidden');
+        canvas.style.pointerEvents = 'auto';
 
-        // 1. 產生點 (相同)
+        // 1. 產生點
         for (let r = 0; r < GRID_SIZE; r++) {
             dots[r] = [];
             for (let c = 0; c < GRID_SIZE; c++) {
@@ -68,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // 2. 產生線段 (相同)
+        // 2. 產生線段
         lines = {};
         for (let r = 0; r < GRID_SIZE; r++) {
             for (let c = 0; c < GRID_SIZE; c++) {
@@ -83,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // 3. 產生正方形 (相同)
+        // 3. 產生正方形
         squares = [];
         for (let r = 0; r < GRID_SIZE - 1; r++) {
             for (let c = 0; c < GRID_SIZE - 1; c++) {
@@ -107,11 +108,11 @@ document.addEventListener('DOMContentLoaded', () => {
         drawCanvas();
     }
 
-    // 繪製所有遊戲元素
+    // 繪製所有遊戲元素 (與前一版相同)
     function drawCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 1. 繪製已完成的正方形 (填色) (相同)
+        // 1. 繪製已完成的正方形 (填色)
         squares.forEach(sq => {
             if (sq.filled) {
                 ctx.fillStyle = PLAYER_COLORS[sq.player].fill;
@@ -121,7 +122,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.font = 'bold 48px var(--font-main, sans-serif)';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(sq.player, sq.x + sq.size / 2, sq.y + sq.size / 2 + 5); 
+                const playerLabel = (gameMode === 'pvc' && sq.player === 2) ? "C" : sq.player;
+                ctx.fillText(playerLabel, sq.x + sq.size / 2, sq.y + sq.size / 2 + 5); 
             }
         });
 
@@ -133,18 +135,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const hasP2 = line.players.includes(2);
 
             if (!hasP1 && !hasP2) {
-                // --- 1. 虛線 (未畫) ---
+                // 1. 虛線 (未畫)
                 ctx.beginPath();
                 ctx.moveTo(line.p1.x, line.p1.y);
                 ctx.lineTo(line.p2.x, line.p2.y);
                 ctx.strokeStyle = DEFAULT_LINE_COLOR;
-                // --- 【修改 3】 ---
-                ctx.lineWidth = 2; // (原: 1)
+                ctx.lineWidth = 2;
                 ctx.setLineDash([2, 4]);
                 ctx.stroke();
 
             } else if (hasP1 && !hasP2) {
-                // --- 2. 只有 P1 (全寬) ---
+                // 2. 只有 P1 (全寬)
                 ctx.beginPath();
                 ctx.moveTo(line.p1.x, line.p1.y);
                 ctx.lineTo(line.p2.x, line.p2.y);
@@ -153,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.stroke();
                 
             } else if (!hasP1 && hasP2) {
-                // --- 3. 只有 P2 (全寬) ---
+                // 3. 只有 P2 (全寬)
                 ctx.beginPath();
                 ctx.moveTo(line.p1.x, line.p1.y);
                 ctx.lineTo(line.p2.x, line.p2.y);
@@ -162,18 +163,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.stroke();
 
             } else if (hasP1 && hasP2) {
-                // --- 4. 重疊 (P1 和 P2 都有) ---
-                
+                // 4. 重疊 (P1 和 P2 都有)
                 let dx = line.p2.x - line.p1.x;
                 let dy = line.p2.y - line.p1.y;
                 const len = Math.max(1, Math.sqrt(dx * dx + dy * dy)); 
                 const norm_x = -dy / len;
                 const norm_y = dx / len;
 
-                // (LINE_WIDTH 已在上方修改為 8)
-                const offsetX = norm_x * (LINE_WIDTH / 4); // 偏移 2px
-                const offsetY = norm_y * (LINE_WIDTH / 4); // 偏移 2px
-                const halfWidth = LINE_WIDTH / 2; // 半寬 4px
+                const offsetX = norm_x * (LINE_WIDTH / 4);
+                const offsetY = norm_y * (LINE_WIDTH / 4);
+                const halfWidth = LINE_WIDTH / 2;
 
                 // 繪製 玩家 1 (偏移 -)
                 ctx.beginPath();
@@ -194,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.setLineDash([]); 
         }
 
-        // 3. 繪製所有的點 (相同)
+        // 3. 繪製所有的點
         for (let r = 0; r < GRID_SIZE; r++) {
             for (let c = 0; c < GRID_SIZE; c++) {
                 ctx.beginPath();
@@ -204,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // 4. 高亮顯示被選中的點 (相同)
+        // 4. 高亮顯示被選中的點
         [selectedDot1, selectedDot2].forEach(dot => {
             if (dot) {
                 ctx.beginPath();
@@ -216,11 +215,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 點擊/觸控畫布 (相同)
+    // 點擊/觸控畫布 (與前一版相同)
     function handleCanvasClick(e) {
-        if (!actionBar.classList.contains('hidden')) {
+        if ((gameMode === 'pvc' && currentPlayer === 2) || !actionBar.classList.contains('hidden')) {
             return;
         }
+        
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
         drawCanvas();
     }
 
-    // "確認連線" 按鈕的函式 (相同)
+    // "確認連線" 按鈕的函式
     function confirmLine() {
         if (!selectedDot1 || !selectedDot2) return;
         const dotA = selectedDot1;
@@ -292,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        let scoredThisTurn = false; 
+        let scoredThisTurn = false; // 仍然需要檢查是否得分，但只用於計分
         let totalFilledSquares = 0;
         
         squares.forEach(sq => {
@@ -303,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     sq.filled = true;
                     sq.player = currentPlayer;
                     scores[currentPlayer]++;
-                    scoredThisTurn = true; 
+                    scoredThisTurn = true; // 標記得分
                 }
             }
             if (sq.filled) totalFilledSquares++;
@@ -321,12 +321,16 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        if (!scoredThisTurn) {
-            switchPlayer();
-        }
+        // --- 【修改】 ---
+        // 移除 if (!scoredThisTurn) 判斷
+        // 無論是否得分，都切換玩家
+        switchPlayer();
+        
+        // 檢查是否輪到 AI
+        checkAndTriggerAIMove();
     }
 
-    // "取消選取" 按鈕的函式 (相同)
+    // "取消選取" 按鈕的函式 (與前一版相同)
     function cancelLine() {
         selectedDot1 = null;
         selectedDot2 = null;
@@ -335,7 +339,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ----- 輔助函式 (以下皆相同) -----
+    // ----- 輔助函式 (與前一版相同) -----
+
+    function isGameOver() {
+        return !gameOverMessage.classList.contains('hidden');
+    }
 
     function findNearestDot(mouseX, mouseY) {
         for (let r = 0; r < GRID_SIZE; r++) {
@@ -350,7 +358,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return null;
     }
 
-function isValidLine(dotA, dotB) {
+    function isValidLine(dotA, dotB) {
         const dr = Math.abs(dotA.r - dotB.r);
         const dc = Math.abs(dotA.c - dotB.c);
         return dr === 0 || dc === 0;
@@ -395,8 +403,11 @@ function isValidLine(dotA, dotB) {
     }
 
     function updateUI() {
-        score1El.textContent = scores[1];
-        score2El.textContent = scores[2];
+        const player2Name = (gameMode === 'pvc') ? "電腦" : "玩家 2";
+        
+        player1ScoreBox.innerHTML = `玩家 1: <span id="score1">${scores[1]}</span>`;
+        player2ScoreBox.innerHTML = `${player2Name}: <span id="score2">${scores[2]}</span>`;
+
         if (currentPlayer === 1) {
             player1ScoreBox.classList.add('active');
             player2ScoreBox.classList.remove('active', 'player2');
@@ -408,19 +419,149 @@ function isValidLine(dotA, dotB) {
 
     function endGame() {
         let winnerMessage = "";
+        const player2Name = (gameMode === 'pvc') ? "電腦" : "玩家 2";
+        
         if (scores[1] > scores[2]) {
             winnerMessage = "玩家 1 獲勝！";
         } else if (scores[2] > scores[1]) {
-            winnerMessage = "玩家 2 獲勝！";
+            winnerMessage = `${player2Name} 獲勝！`;
         } else {
             winnerMessage = "平手！";
         }
         winnerText.textContent = winnerMessage;
         gameOverMessage.classList.remove('hidden');
         actionBar.classList.add('hidden');
+        canvas.style.pointerEvents = 'auto';
+    }
+    
+    // --- AI 相關函式 ---
+
+    // checkAndTriggerAIMove (與前一版相同)
+    function checkAndTriggerAIMove() {
+        if (gameMode === 'pvc' && currentPlayer === 2 && !isGameOver()) {
+            canvas.style.pointerEvents = 'none'; 
+            actionBar.classList.add('hidden');
+            
+            setTimeout(() => {
+                aiMove();
+                if (currentPlayer === 1) {
+                    canvas.style.pointerEvents = 'auto';
+                }
+            }, 600);
+        } else {
+            if (gameMode === 'pvp' || currentPlayer === 1) {
+                 canvas.style.pointerEvents = 'auto';
+            }
+        }
     }
 
-    // 綁定所有事件 (相同)
+    // AI 執行一步
+    function aiMove() {
+        let availableSegments = [];
+        for (const id in lines) {
+            if (lines[id].players.length === 0) {
+                availableSegments.push(lines[id]);
+            }
+        }
+        
+        if (availableSegments.length === 0) {
+            if (!isGameOver()) switchPlayer();
+            return;
+        }
+
+        let winningMoves = [];
+        let safeMoves = [];
+        let unsafeMoves = [];
+
+        // (AI 的決策邏輯不變)
+        for (const segment of availableSegments) {
+            let squaresCompleted = 0;
+            let isUnsafe = false;
+
+            squares.forEach(sq => {
+                if (sq.filled || !sq.lineKeys.includes(segment.id)) {
+                    return; 
+                }
+
+                let sidesDrawn = 0;
+                sq.lineKeys.forEach(key => {
+                    if (lines[key].players.length > 0) {
+                        sidesDrawn++;
+                    }
+                });
+
+                if (sidesDrawn === 3) {
+                    squaresCompleted++;
+                } else if (sidesDrawn === 2) {
+                    isUnsafe = true;
+                }
+            });
+
+            if (squaresCompleted > 0) {
+                winningMoves.push(segment);
+            } else if (isUnsafe) {
+                unsafeMoves.push(segment);
+            } else {
+                safeMoves.push(segment);
+            }
+        }
+        
+        let segmentToDraw;
+        if (winningMoves.length > 0) {
+            segmentToDraw = winningMoves[Math.floor(Math.random() * winningMoves.length)];
+        } else if (safeMoves.length > 0) {
+            segmentToDraw = safeMoves[Math.floor(Math.random() * safeMoves.length)];
+        } else if (unsafeMoves.length > 0) {
+            segmentToDraw = unsafeMoves[Math.floor(Math.random() * unsafeMoves.length)];
+        } else {
+            segmentToDraw = availableSegments[Math.floor(Math.random() * availableSegments.length)];
+        }
+
+        if (!segmentToDraw) {
+             if (!isGameOver()) switchPlayer();
+             return;
+        }
+        
+        if (!segmentToDraw.players.includes(currentPlayer)) {
+            segmentToDraw.players.push(currentPlayer);
+        }
+        
+        let scoredThisTurn = false; // 仍然需要計分
+        let totalFilledSquares = 0;
+        
+        squares.forEach(sq => {
+            if (!sq.filled) {
+                const isComplete = sq.lineKeys.every(key => lines[key] && lines[key].players.length > 0);
+                
+                if (isComplete) {
+                    sq.filled = true;
+                    sq.player = currentPlayer;
+                    scores[currentPlayer]++;
+                    scoredThisTurn = true; 
+                }
+            }
+            if (sq.filled) totalFilledSquares++;
+        });
+        
+        drawCanvas();
+        updateUI();
+
+        if (totalFilledSquares === totalSquares) {
+            endGame();
+            return;
+        }
+
+        // --- 【修改】 ---
+        // 移除 if (!scoredThisTurn) 的 else 區塊
+        // 無論 AI 是否得分，都切換回玩家
+        switchPlayer();
+        canvas.style.pointerEvents = 'auto'; // 輪到玩家，解鎖畫布
+    }
+
+    // --- 結束 AI 相關函式 ---
+
+
+    // 綁定所有事件 (與前一版相同)
     canvas.addEventListener('click', handleCanvasClick);
     canvas.addEventListener('touchstart', function(e) {
         e.preventDefault();
@@ -429,6 +570,7 @@ function isValidLine(dotA, dotB) {
     resetButton.addEventListener('click', initGame);
     confirmLineButton.addEventListener('click', confirmLine);
     cancelLineButton.addEventListener('click', cancelLine);
+    gameModeSelect.addEventListener('change', initGame);
 
     // 啟動遊戲
     initGame();
