@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>點點圍四角線加入電腦對戰</title>
+    <title>點點圍四角線可重疊</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    
+<link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h1>點點圍四角線加入電腦對戰</h1>
+    <h1>點點圍四角線可重疊</h1>
 
     <div id="game-container">
         <div id="status-bar">
@@ -44,7 +46,28 @@
                     <option value="pvc">玩家 vs 電腦</option>
                 </select>
             </div>
-            <button id="reset-button" class="btn success">重新開始</button>
+            
+            <div id="control-buttons">
+                <button id="rules-button" class="btn secondary">遊戲規則</button>
+                <button id="reset-button" class="btn success">重新開始</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="rules-modal" class="modal-hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <h2>遊戲規則</h2>
+            <ul>
+                <li><strong>目標:</strong> 佔領比對手更多的正方形。</li>
+                <li><strong>玩法:</strong> 玩家輪流在兩個相鄰的點之間畫一條線。</li>
+                <li><strong>得分:</strong> 當您畫下一條線，完成了一個 1x1 正方形的第四條邊時，您就佔領了該方塊並得分。</li>
+                <li><strong>規則:</strong> 無論是否得分，每回合只能畫一次線，然後換邊。</li>
+                <li><strong>連線:</strong> 您可以一次連接多個點（畫一條長線），但必須是直線或橫線。</li>
+                <li><strong>重疊:</strong> 雙方玩家可以畫在同一條路徑上 (線會並排顯示)。</li>
+                <li><strong>結束:</strong> 當所有正方形都被佔領時，遊戲結束，得分高者獲勝。</li>
+            </ul>
+            <button id="close-rules-button" class="btn primary">關閉</button>
         </div>
     </div>
 
